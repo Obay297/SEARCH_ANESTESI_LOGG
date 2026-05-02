@@ -1,11 +1,9 @@
 """
-generate_study_pdf.py
----------------------
+
 Generates a study PDF that explains every file and every function
 in the anesthesia monitoring project in plain, simple language.
 
-Run:  python generate_study_pdf.py
-Output: Code_Explanation_Study_Guide.pdf
+
 """
 
 from reportlab.lib.pagesizes import A4
@@ -20,7 +18,7 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER
 
 OUTPUT_FILE = "Code_Explanation_Study_Guide.pdf"
 
-# ── Colour palette ─────────────────────────────────────────────────────────────
+#  Colour palette 
 DARK_BLUE   = colors.HexColor("#1a2a4a")
 MID_BLUE    = colors.HexColor("#2c4a7c")
 LIGHT_BLUE  = colors.HexColor("#e8f0fb")
@@ -30,7 +28,7 @@ BORDER      = colors.HexColor("#c0cce0")
 WHITE       = colors.white
 TEXT        = colors.HexColor("#1a1a2e")
 
-# ── Styles ─────────────────────────────────────────────────────────────────────
+#  Styles 
 base = getSampleStyleSheet()
 
 def make_style(name, parent="Normal", **kwargs):
@@ -96,7 +94,7 @@ SECTION_STYLE = make_style(
     spaceBefore=12, spaceAfter=4,
 )
 
-# ── Builder helpers ────────────────────────────────────────────────────────────
+#  Builder helpers
 
 def chapter_banner(title, subtitle=""):
     """Return a full-width coloured banner for a chapter heading."""
@@ -217,8 +215,7 @@ def hr():
     return HRFlowable(width="100%", thickness=1, color=BORDER, spaceAfter=4)
 
 
-# ── Cover page ─────────────────────────────────────────────────────────────────
-
+# Cover page
 def build_cover():
     cover_data = [[
         Paragraph("Pig Anesthesia Monitoring", TITLE_STYLE),
@@ -244,7 +241,7 @@ def build_cover():
     return [tbl, PageBreak()]
 
 
-# ── Content ────────────────────────────────────────────────────────────────────
+#Content 
 
 def build_overview():
     items = [
@@ -311,7 +308,7 @@ def build_backend():
         chapter_banner("Backend Files", "Python — runs on the server"),
         spacer(0.5),
 
-        # ── server.py ──────────────────────────────────────────────────────────
+        #  server.py 
         file_box("server.py", "Python",
             "The starting point of the whole backend. You run this file to start the server. "
             "It contains no functions — it just tells Python to launch the web server (Uvicorn) "
@@ -322,7 +319,7 @@ def build_backend():
                   "run 'python server.py' to start everything.", TIP_STYLE),
         spacer(0.5),
 
-        # ── backend_config.py ──────────────────────────────────────────────────
+        #  backend_config.py
         file_box("backend_config.py", "Python",
             "Stores all the important file paths and settings in one place. "
             "No functions — just variables. If you move the project to a new computer "
@@ -337,7 +334,7 @@ def build_backend():
         ),
         spacer(0.5),
 
-        # ── backend_models.py ─────────────────────────────────────────────────
+        #  backend_models.py
         file_box("backend_models.py", "Python",
             "Defines the shape of the data that travels between the frontend and backend. "
             "Uses Pydantic — a library that checks that the incoming data has the right fields "
@@ -352,7 +349,7 @@ def build_backend():
         Paragraph("<b>MonitoringExportRequest</b> — all data needed to build the Excel export.", DETAIL_STYLE),
         spacer(0.5),
 
-        # ── backend_sessions.py ───────────────────────────────────────────────
+        #  backend_sessions.py
         file_box("backend_sessions.py", "Python",
             "Manages one recording session at a time. A 'session' is a folder on disk that "
             "stores the patient data and events in a JSON file. This makes sure nothing is "
@@ -396,7 +393,7 @@ def build_backend():
         ]),
         spacer(0.5),
 
-        # ── backend_reports.py ────────────────────────────────────────────────
+        #  backend_reports.py
         file_box("backend_reports.py", "Python",
             "Creates a very simple HTML report file on the server. "
             "This is a placeholder — the real, detailed report with charts is built "
@@ -415,7 +412,7 @@ def build_backend():
         ]),
         PageBreak(),
 
-        # ── backend_vitalrecorder.py ──────────────────────────────────────────
+        #  backend_vitalrecorder.py
         file_box("backend_vitalrecorder.py", "Python",
             "Controls VitalRecorder — the external program that talks to the physical "
             "monitoring equipment. This module starts and stops the program, and finds "
@@ -782,7 +779,7 @@ def build_frontend():
         chapter_banner("Frontend Files", "JavaScript — runs in the browser"),
         spacer(0.5),
 
-        # ── patient.js ─────────────────────────────────────────────────────────
+        # patient.js
         file_box("patient.js", "JavaScript",
             "Reads and manages the patient information form. "
             "Does not store any data itself — just reads from the form and "
@@ -817,7 +814,7 @@ def build_frontend():
         ]),
         spacer(0.5),
 
-        # ── waves.js ───────────────────────────────────────────────────────────
+        #  waves.js
         file_box("waves.js", "JavaScript",
             "Draws waveforms (ECG, blood pressure, SpO2, CO2) on a canvas element. "
             "Handles gaps in the data by lifting the pen so broken signals "
@@ -870,7 +867,7 @@ def build_frontend():
         ]),
         spacer(0.5),
 
-        # ── simulator.js ───────────────────────────────────────────────────────
+        #  simulator.js 
         file_box("simulator.js", "JavaScript",
             "Generates realistic fake vital signs for testing and demonstration "
             "when no physical equipment is connected. "
@@ -1033,7 +1030,7 @@ def build_exam_tips():
     return items
 
 
-# ── Page template ──────────────────────────────────────────────────────────────
+# Page template
 
 def on_page(canvas, doc):
     """Draw header and footer on every page."""
@@ -1059,7 +1056,7 @@ def on_page(canvas, doc):
     canvas.restoreState()
 
 
-# ── Main ───────────────────────────────────────────────────────────────────────
+#Main
 
 def main():
     doc = SimpleDocTemplate(
