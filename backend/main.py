@@ -3,17 +3,7 @@ backend_main.py
 ---------------
 FastAPI application: REST endpoints and WebSocket for real-time streaming.
 
-Architecture overview
-~~~~~~~~~~~~~~~~~~~~~
-* REST endpoints handle the recording lifecycle (select source, start,
-  stop) and file-based operations (load latest recording, export Excel).
-* A single WebSocket endpoint (``/live``) streams vital-sign measurements
-  to the frontend every second while a recording is active.
-* Two data sources are supported in parallel and tried in order:
-    1. VitalRecorder HTTP API (port 14041) — lowest latency.
-    2. Growing ``.vital`` file — fallback when the HTTP API is disabled.
-* Static files (HTML, CSS, JS) are served from the project root directory
-  and must be mounted **last** so API routes take priority.
+
 """
 
 from __future__ import annotations
@@ -52,7 +42,7 @@ except Exception:
     _VitalFile = None  # type: ignore
 
 
-# ── Application setup ──────────────────────────────────────────────────────────
+# Application setup 
 
 app = FastAPI(
     title="Anesthesia Monitoring Backend",
@@ -74,7 +64,7 @@ vr_bridge      = VitalRecorderBridge()
 current_source = {"name": "simulation"}
 
 
-# ── VitalRecorder HTTP API constants ───────────────────────────────────────────
+# VitalRecorder HTTP API constants 
 #
 # VitalRecorder exposes a REST API on port 14041 (must be enabled in settings).
 #   GET /api/trks          → list of active track names
@@ -130,7 +120,7 @@ _VR_POLL_TRACKS = [
 ]
 
 
-# ── Private helpers ────────────────────────────────────────────────────────────
+#  Private helpers 
 
 def _resolve_latest_vital_file() -> str | None:
     """
@@ -314,7 +304,7 @@ def _map_vr_tracks_to_measurements(raw: dict) -> dict:
     }
 
 
-# ── REST endpoints ─────────────────────────────────────────────────────────────
+# REST endpoints
 
 @app.get("/health")
 async def health():
@@ -608,7 +598,7 @@ async def export_monitoring_xlsx(payload: MonitoringExportRequest):
     )
 
 
-# ── WebSocket: real-time vital sign stream ─────────────────────────────────────
+#  WebSocket: real-time vital sign stream 
 
 @app.websocket("/live")
 async def live_socket(websocket: WebSocket):
@@ -644,7 +634,7 @@ async def live_socket(websocket: WebSocket):
         pass
 
 
-# ── Static file serving ────────────────────────────────────────────────────────
+#  Static file serving 
 # Must be mounted LAST so all API routes above take priority.
 app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
 
