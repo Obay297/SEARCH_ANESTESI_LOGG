@@ -2,8 +2,6 @@
 backend_main.py
 ---------------
 FastAPI application: REST endpoints and WebSocket for real-time streaming.
-
-
 """
 
 from __future__ import annotations
