@@ -544,9 +544,7 @@ body {
   display: none;
 }
 
-/* ══════════════════════════════════════════════
-   VitalRecorder Live Track Inspector
-══════════════════════════════════════════════ */
+/ VitalRecorder Live Track Inspector /
 .vri-summary-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -945,9 +943,7 @@ body {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   Reference-style anesthesia monitor dashboard
-   ═══════════════════════════════════════════════════════════════════ */
+/ Reference-style anesthesia monitor dashboard/
 
 #pig-monitoring-panel {
   background: #06090d;
@@ -998,7 +994,7 @@ body {
 .monitor-kpi-val  { font-size: 1.55rem; font-weight: 800; line-height: 1; }
 .monitor-kpi-unit { font-size: 0.8rem; opacity: 0.75; }
 
-/* ── Colored stat big numbers ───────────────────────────── */
+/ Colored stat big numbers/
 .monitor-stat-value               { color: #e8f4ff; }
 .monitor-stat-value.vt-color      { color: #4da3ff; }
 .monitor-stat-value.resp-color    { color: #7bc043; }
@@ -1007,7 +1003,7 @@ body {
 .monitor-stat-value.flow-color    { color: #ff9800; }
 .monitor-stat-value.peep2-color   { color: #ff9800; }
 
-/* ── Medication chart legend ────────────────────────────── */
+/ Medication chart legend /
 .monitor-med-legend {
   display: flex;
   gap: 1.5rem;
@@ -1030,7 +1026,7 @@ body {
   flex-shrink: 0;
 }
 
-/* ── ECG HR big readout ─────────────────────────────────── */
+/ ECG HR big readout/
 .monitor-ecg-kpis {
   text-align: right;
   line-height: 1;
@@ -1049,7 +1045,7 @@ body {
   display: block;
 }
 
-/* ── 4-column lung grid ─────────────────────────────────── */
+/ 4-column lung grid/
 .monitor-lung-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
 }
@@ -1068,7 +1064,7 @@ body {
   text-transform: none;
 }
 
-/* ── Vertical bar gauges ────────────────────────────────── */
+/ Vertical bar gauges/
 .monitor-bar-set {
   display: flex;
   gap: 10px;
