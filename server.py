@@ -1,13 +1,13 @@
 """
 server.py
 ---------
-Entry point for the anesthesia monitoring backend.
+Entry point for the anesthesia monitoring backend (SEARCH_ANESTESI_LOGG).
 
 Run this file directly to start the FastAPI development server:
     python server.py
 
 The server listens on 127.0.0.1:8001 by default. All API routes and
-the WebSocket endpoint are defined in backend_main.py.
+The WebSocket endpoints are defined in backend_main.py.
 """
 
 import uvicorn
