@@ -1,14 +1,4 @@
-"""
-backend_config.py
------------------
-Central configuration for the anesthesia monitoring backend.
-
-All file-system paths and server settings are defined here so that they
-are easy to find and change in one place. Each path can be overridden
-via an environment variable, which is useful when deploying on a
-different machine without editing source code.
-"""
-
+# Central configuration for the anesthesia monitoring backend.
 from __future__ import annotations
 
 from pathlib import Path
