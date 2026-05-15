@@ -190,7 +190,7 @@ function drawMedicationBars(canvas, entries) {
   });
 }
 
-// ── Cardinal spline: smooth bezier through pts array ─────────────
+
 function _spline(ctx, pts) {
   if (pts.length < 2) return;
   ctx.moveTo(pts[0].x, pts[0].y);
@@ -217,7 +217,7 @@ function drawVitalTrend(canvas, entries) {
   const pL = 10, pR = 10, pT = 12, pB = 12;
   const cW = W - pL - pR, cH = H - pT - pB;
 
-  // ── Subtle horizontal grid lines ──────────────────────────────
+
   ctx.strokeStyle = 'rgba(255,255,255,0.06)';
   ctx.lineWidth   = 1;
   [0.25, 0.5, 0.75].forEach(f => {
@@ -235,9 +235,7 @@ function drawVitalTrend(canvas, entries) {
   const recent = entries.slice(-40);
   const n      = recent.length;
 
-  // Each series gets its own vertical BAND (yHi → yLo as fractions of cH from top).
-  // Bands overlap slightly so the chart still feels connected, but each line
-  // lives in its own territory instead of spanning the full 0–100% height.
+
   const series = [
     { key: 'bpSys', color: '#ffd400', yHi: 0.02, yLo: 0.40 }, // top band
     { key: 'spo2',  color: '#49d8ff', yHi: 0.22, yLo: 0.60 }, // upper-middle
@@ -265,7 +263,7 @@ function drawVitalTrend(canvas, entries) {
     }, []);
     if (pts.length < 2) return;
 
-    // ── Glow pass (wide soft stroke) ──────────────────────────
+  
     ctx.save();
     ctx.shadowColor = s.color;
     ctx.shadowBlur  = 8;
@@ -276,7 +274,7 @@ function drawVitalTrend(canvas, entries) {
     ctx.stroke();
     ctx.restore();
 
-    // ── Main smooth line ──────────────────────────────────────
+─
     ctx.save();
     ctx.shadowColor = s.color;
     ctx.shadowBlur  = 4;
@@ -287,7 +285,7 @@ function drawVitalTrend(canvas, entries) {
     ctx.stroke();
     ctx.restore();
 
-    // ── Dots every 4th point + always first/last ──────────────
+    
     ctx.shadowBlur = 0;
     pts.forEach((p, i) => {
       if (i % 4 !== 0 && i !== pts.length - 1) return;
@@ -360,7 +358,7 @@ function drawEcgStrip(canvas, entries) {
   const ecgH  = Math.round(cH * 0.65);
   const respH = cH - ecgH;     // 35%
 
-  // ── Background grid ──────────────────────────────────────────────
+
   ctx.strokeStyle = 'rgba(255,255,255,0.07)';
   ctx.lineWidth   = 1;
   // Horizontal separator between ECG and breathing zones
@@ -381,11 +379,9 @@ function drawEcgStrip(canvas, entries) {
   const recent = entries.slice(-80);
   const n      = recent.length;
 
-  // ── ECG waveform (P-QRS-T complex) in top zone ──────────────────
-  // Use a lookup table so the R-spike always lands on an actual sample.
-  // CYCLE = 14 → ~5-6 complete complexes across 80 entries (good density).
+
   const CYCLE = 14;
-  // v = fraction of zone height from bottom (0=bottom, 1=top)
+
   const ECG_SHAPE = [
     0.42,  //  0 isoelectric
     0.42,  //  1 isoelectric
@@ -418,8 +414,7 @@ function drawEcgStrip(canvas, entries) {
   ctx.lineWidth   = 2.4;
   ctx.stroke();
 
-  // ── Breathing waveform (smooth sinusoid) in bottom zone ─────────
-  // 4 full respiratory cycles across the strip
+ 
   const respTop = ecgH + 4, respBot = cH - 4;
   const respAmp = (respBot - respTop) * 0.42;   // 42% of zone height
   const respMid = (respTop + respBot) / 2;
@@ -438,7 +433,7 @@ function drawEcgStrip(canvas, entries) {
   ctx.lineWidth   = 2;
   ctx.stroke();
 
-  // ── Time labels at bottom ────────────────────────────────────────
+  
   ctx.fillStyle   = 'rgba(255,255,255,0.55)';
   ctx.font        = '14px courier new';
   ctx.textAlign   = 'center';
@@ -479,7 +474,7 @@ function updateDashboardTiles(entry, refs) {
   if (!refs.dashboard) return;
   const d = refs.dashboard;
 
-  // ── Text readouts ─────────────────────────────────────────────────
+
   if (d.vtValue)     d.vtValue.textContent     = formatNumber(entry.vtMl || 0, 1);
   if (d.respValue)   d.respValue.textContent   = formatNumber(entry.resp  || 0, 1);
   if (d.peepValue)   d.peepValue.textContent   = formatNumber(entry.peep  || 0, 1);
@@ -493,7 +488,6 @@ function updateDashboardTiles(entry, refs) {
   if (d.mvValue)     d.mvValue.textContent     = formatNumber(entry.mv    || 0, 1);
   if (d.pmaxBarValue) d.pmaxBarValue.textContent = formatNumber(entry.pmax || 0, 1);
 
-  // ── Bar gauge heights ─────────────────────────────────────────────
   // Vt: normal pig range 300–600 mL, max scale 800 mL
   setBarHeight(d.vtBar,   entry.vtMl || 0, 800);
   // RR: normal 25–35 /min, max scale 50
