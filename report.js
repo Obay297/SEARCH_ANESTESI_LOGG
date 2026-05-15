@@ -1,3 +1,9 @@
+// report.js: Builds a medical vital signs report
+// Displays it as either graphs or a table of numbers, depending on the selected mode
+// Prepares patient data, events, and printable output
+
+
+
 import { getPatientFormData } from './patient.js';
 
 //  View mode & display interval 
