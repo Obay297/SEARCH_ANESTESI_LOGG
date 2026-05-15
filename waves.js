@@ -1,23 +1,4 @@
-/**
- * waves.js
- * --------
- * Canvas rendering utilities for high-frequency waveform data.
- *
- * Draws waveforms (ECG, arterial pressure, pleth, CO₂) on an HTML
- * <canvas> element. Gaps in the data (null or non-finite values) are
- * rendered as breaks in the line rather than connecting across missing
- * samples.
- */
 
-
-/**
- * Draw a faint grid on the canvas to give the waveform a monitor-like
- * appearance.
- *
- * @param {CanvasRenderingContext2D} ctx    - The 2D rendering context.
- * @param {number}                  width  - Canvas width in pixels.
- * @param {number}                  height - Canvas height in pixels.
- */
 function drawGrid(ctx, width, height) {
   ctx.save();
   ctx.strokeStyle = 'rgba(120, 220, 255, 0.10)';
@@ -41,19 +22,7 @@ function drawGrid(ctx, width, height) {
 }
 
 
-/**
- * Draw a waveform onto a canvas element.
- *
- * The y-axis is auto-scaled to the min/max of the finite samples in
- * ``data``. Non-finite values (null, NaN, Infinity) interrupt the line,
- * which visually represents recording gaps.
- *
- * @param {HTMLCanvasElement}      canvas - Target canvas element.
- * @param {(number|null)[]}        data   - Array of sample values. Use
- *                                          null or NaN to indicate gaps.
- * @param {string}                 [color='#00ff88'] - Stroke colour for
- *                                          the waveform line.
- */
+
 export function drawWave(canvas, data, color = '#00ff88') {
   if (!canvas) return;
 
@@ -113,14 +82,7 @@ export function drawWave(canvas, data, color = '#00ff88') {
 }
 
 
-/**
- * Scroll the waveform container into view smoothly.
- *
- * Called after a waveform is loaded so the user does not have to scroll
- * manually to see the newly rendered chart.
- *
- * @param {Element|null} container - The DOM element to scroll into view.
- */
+
 export function prepareWaveView(container) {
   container?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
