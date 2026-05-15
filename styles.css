@@ -1,3 +1,5 @@
+//This stylesheet defines the full visual structure of a medical monitoring dashboard interface.
+
 :root {
   --bg-panel: rgba(10, 24, 34, 0.82);
   --bg-soft: rgba(19, 45, 62, 0.78);
