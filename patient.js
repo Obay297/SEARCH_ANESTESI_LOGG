@@ -1,3 +1,6 @@
+//patient.js: The first function populates the patient form with the current date and time if the field is empty. 
+//The second function uses all the data entered into the form and returns it as a sorted object for later saving or processing.
+
 export function setAutomaticDate(form) {
   if (!form) return;
 
