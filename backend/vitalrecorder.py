@@ -1,13 +1,6 @@
 """
 backend_vitalrecorder.py
-------------------------
 Bridge between the Python backend and the VitalRecorder™ application.
-
-VitalRecorder is a third-party Windows application that records vital
-signs from patient monitors into proprietary `.vital` files. This
-module launches the executable as a subprocess, waits for the `.vital`
-file to appear on disk, and renames it according to the patient ID so
-each file can be matched to a session later.
 """
 
 from __future__ import annotations
@@ -21,31 +14,12 @@ from backend_config import RECORDINGS_ROOT, VITAL_RECORDER_EXE
 
 
 def _safe_stem(text: str) -> str:
-    """
-    Strip characters that are not safe in a Windows filename.
-
-    Args:
-        text: Raw string to sanitise (e.g. a patient ID that may
-              contain slashes or colons).
-
-    Returns:
-        A string that is safe to use as a filename stem on Windows.
-    """
+   
     return re.sub(r'[\\/:*?"<>|]+', "_", text).strip("_ ")
 
 
 class VitalRecorderBridge:
-    """
-    Manages the lifecycle of one VitalRecorder recording session.
-
-    Typical usage::
-
-        bridge = VitalRecorderBridge()
-        bridge.start(desired_stem="pig42_20260101")
-        # … recording in progress …
-        result = bridge.stop()  # blocks until the .vital file is stable
-        print(result["vital_file"])  # path to the finished recording
-    """
+   
 
     def __init__(self) -> None:
         self.running                       = False
@@ -96,18 +70,7 @@ class VitalRecorderBridge:
         }
 
     def stop(self) -> dict:
-        """
-        Terminate VitalRecorder and wait for the `.vital` file to be flushed.
-
-        The method polls the recordings directory for up to 15 seconds
-        until the file size stops changing, which indicates that
-        VitalRecorder has finished writing. The file is then renamed
-        using the stem passed to ``start()``.
-
-        Returns:
-            A dict with ``ok`` (bool), ``message`` (str), and
-            ``vital_file`` (str path or None).
-        """
+       
         self.running = False
 
         if self.process and self.process.poll() is None:
@@ -152,17 +115,7 @@ class VitalRecorderBridge:
         }
 
     def find_newest_vital_file(self) -> Path | None:
-        """
-        Return the most recently modified `.vital` file in the recordings root.
-
-        When a recording is active, only files modified after
-        ``recording_started_at`` (minus a 10-second grace period) are
-        considered, preventing stale files from earlier sessions from
-        being returned.
-
-        Returns:
-            A Path to the newest `.vital` file, or None if none exist.
-        """
+       
         if not self.recordings_root.exists():
             return None
 
