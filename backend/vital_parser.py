@@ -1,7 +1,5 @@
 """
-backend_vital_parser.py
-
-Parses `.vital` files produced by VitalRecorder™ into structured data.
+Parses .vital files produced by VitalRecorder into structured data.
 """
 
 from __future__ import annotations
@@ -14,9 +12,9 @@ from typing import Any
 import numpy as np
 
 try:
-    from vitaldb import VitalFile  # type: ignore
-except Exception:  # pragma: no cover
-    VitalFile = None  # type: ignore
+    from vitaldb import VitalFile  # type ignore
+except Exception:  # pragma no cover
+    VitalFile = None  # type ignore
 
 
 DEVICE_LAYOUT = [
@@ -275,7 +273,7 @@ def _get_available_tracks(vf: Any) -> list[str]:
 
     return []
 
-
+# Attempts to match signal tracks using exact
 def _find_track_name(vf: Any, candidates: list[str]) -> str | None:
     available = _get_available_tracks(vf)
     if not available:
@@ -345,7 +343,7 @@ def _is_valid_value(value: float | int | None, signal_key: str) -> bool:
 
     return True
 
-
+# Finds first stable sequence of valid samples
 def find_first_stable_valid_value(
     series: Any,
     signal_key: str,
@@ -376,7 +374,7 @@ def find_first_stable_valid_value(
 
     return None
 
-
+# Reduces the number of points to improve chart performance
 def _downsample_points(
     points: list[dict[str, float]], max_points: int = 240
 ) -> list[dict[str, float]]:
@@ -395,7 +393,7 @@ def _downsample_points(
 
     return sampled
 
-
+# Builds time-series points 
 def _build_trend_points(
     series: Any,
     signal_key: str,
@@ -486,7 +484,7 @@ def _extract_duration_seconds(devices: list[dict[str, Any]]) -> int:
                 last_second = max(last_second, float(signal["firstValid"]["second"]))
     return int(round(last_second))
 
-
+ # Creates a snapshot summary at full report
 def _make_snapshot_from_report(report_data: dict[str, Any]) -> dict[str, Any]:
     """
     FIX #9: Build a snapshot with tbp as 'sys/dia' string (matching what the
@@ -608,10 +606,10 @@ def extract_first_valid_measurements(
     )
 
 
-# Legacy timeline report (used by /record/latest and stop-recording) 
+ 
 
 # Multi-candidate track lookup — covers Solar8000, Demo, B1x5M, Bx50, Primus devices.
-# _find_track_name() also does suffix fallback so e.g. "Solar8000/HR" matches "Demo/HR".
+
 LEGACY_TRACK_CANDIDATES: dict[str, list[str]] = {
     "pulse":     ["Solar8000/HR",        "B1x5M/HR",          "Bx50/HR",         "Demo/HR",        "IntelliVue/HR", "SNUADC/HR"],
     "art_sbp":   ["Solar8000/ART_SBP",   "B1x5M/ART1_SBP",  "Bx50/ART1_SBP",  "Demo/ART_SBP",
@@ -700,7 +698,8 @@ def _legacy_last_valid_in_window(series: Any, start_index: int, end_index: int) 
         return 0.0
     return float(window[-1])
 
-
+# Legacy loader supporting older VitalRecorder formats
+# tries to_numpy first, then raw record fallback
 def _legacy_build_measurement(values: dict[str, float]) -> dict[str, Any]:
     sbp = _round_number(values.get("art_sbp"), 1) or 0
     dbp = _round_number(values.get("art_dbp"), 1) or 0
@@ -728,7 +727,8 @@ def _legacy_build_measurement(values: dict[str, float]) -> dict[str, Any]:
         "etco2":        _round_number(values.get("etco2"), 1)     or 0,
     }
 
-
+# Directly reads raw track records when to_numpy fails
+# used as last-resort fallback for missing sampling
 def _read_track_direct(vf: Any, track_name: str) -> np.ndarray:
     """
     Read every finite sample from a track's raw records, bypassing to_numpy.
@@ -833,8 +833,9 @@ def _legacy_build_statistics(timeline: list[dict[str, Any]]) -> list[dict[str, A
         )
     return statistics
 
-
-def extract_report_timeseries(vital_path: str | Path) -> dict[str, Any]:
+# Generates report from Vital file
+# used for timeline UI rendering
+def extract_report_timeseries(vital_path: str | Path) -> dict[str, Any]: 
 
     _ensure_vitaldb_available()
     vital_path = Path(vital_path)
@@ -912,6 +913,7 @@ def _coerce_raw_wave_values(values: Any) -> list[float | None]:
     return result
 
 
+# inserts None for missing signal segments
 def _extract_raw_wave_track(vf: Any, track_name: str) -> tuple[list[float | None], float]:
     trks  = getattr(vf, "trks", {}) or {}
     track = trks.get(track_name)
