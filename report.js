@@ -1,14 +1,14 @@
 import { getPatientFormData } from './patient.js';
 
-// ─── View mode & display interval ────────────────────────────────────────────
-let reportViewMode        = 'charts'; // 'charts' | 'numbers'
-let displayIntervalSecs   = 60;       // 60 = every 1 min, 300 = every 5 min (for table columns)
+//  View mode & display interval 
+let reportViewMode        = 'charts'; 
+let displayIntervalSecs   = 60;       
 
 export function setReportViewMode(mode) { reportViewMode = mode === 'numbers' ? 'numbers' : 'charts'; }
 export function getReportViewMode()     { return reportViewMode; }
 export function setDisplayInterval(s)   { displayIntervalSecs = Number(s) || 60; }
 
-// ─── Monitoring chart definitions (mirrors the Show Monitoring dashboard) ─────
+
 const CHART_CONFIGS = [
   {
     id: 'circulatory',
@@ -88,7 +88,7 @@ const NUMBER_TABLE_PARAMS = [
 ];
 
 // Minimum physiologically valid value per key.
-// Values BELOW this are sensor warm-up / not-yet-attached artifacts.
+
 const PARAM_VALID_MIN = {
   temp: 35,  // °C — probe reads ~25-26 while cold-warming up
 };
@@ -98,12 +98,12 @@ const CHART_CONFIG_KEYS = new Set(
   CHART_CONFIGS.flatMap(g => g.series.map(s => s.key)).filter(k => !k.startsWith('_'))
 );
 
-// Auto-colour palette for signals that aren't in CHART_CONFIGS
+
 const EXTRA_SIGNAL_COLORS = [
   '#94a3b8','#f59e0b','#10b981','#6366f1','#ec4899','#14b8a6','#f97316','#a78bfa',
 ];
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 
 function escapeHtml(v) {
   return String(v ?? '')
@@ -129,12 +129,7 @@ function formatValue(sig) {
   return `${fv.value}${sig.unit ? ` ${sig.unit}` : ''}`;
 }
 
-// ─── Data normalisation ───────────────────────────────────────────────────────
 
-/**
- * Returns [{second, data:{...snapshot fields}}] from ANY report format.
- * Priority: .vital timeline > live minuteMeasurements
- */
 function getTimelinePoints(reportData) {
   // Loaded .vital file timeline (high-resolution, per-second or per-minute).
   // Sort ascending by time — .vital files are often stored newest-first.
@@ -144,7 +139,7 @@ function getTimelinePoints(reportData) {
       .sort((a, b) => a.second - b.second);
   }
 
-  // Structured .vital file: reconstruct pseudo-timeline from signal trends
+
   if (isStructuredReport(reportData)) {
     const signals = flattenSignals(reportData);
     if (signals.length) {
@@ -170,10 +165,7 @@ function getTimelinePoints(reportData) {
   return trimLeadingZeros(raw);
 }
 
-/**
- * Returns [{time, label?, data:{...}}] for the numbers table.
- * Uses minute-level data, resampled to the chosen displayIntervalSecs.
- */
+
 function getMinutePoints(reportData) {
   let pts;
 
@@ -186,7 +178,6 @@ function getMinutePoints(reportData) {
       data:   m.first || {},
     }));
   } else {
-    // From live recording – use minute captures
     const all = collectAllMeasurements(reportData);
     pts = all.map(m => ({ ...m, second: timeToSeconds(m.time) }));
   }
@@ -196,7 +187,7 @@ function getMinutePoints(reportData) {
   return resampleTimeline(cleaned, displayIntervalSecs);
 }
 
-/** Merge first + interval + timepoint + last measurements (deduplicated, sorted). */
+
 function collectAllMeasurements(reportData) {
   const seen = new Set();
   const all  = [];
@@ -212,25 +203,13 @@ function collectAllMeasurements(reportData) {
   return all;
 }
 
-// ─── Zero-trimming & resampling helpers ──────────────────────────────────────
 
-/**
- * Strip leading points where pulse == 0 (device not yet connected).
- * Used on the global timeline before extracting per-series data.
- */
 function trimLeadingZeros(points) {
   const firstReal = points.findIndex(p => parseFloat(p.data?.pulse) > 0);
   return firstReal > 0 ? points.slice(firstReal) : points;
 }
 
-/**
- * Trim BOTH leading and trailing invalid values from a series array.
- * pts      = [{second, value}, ...]
- * validMin = minimum value considered physiologically meaningful (default 0 → any positive)
- *
- * Leading trim: skip until first value that is > 0 AND >= validMin
- * Trailing trim: skip trailing zeros (device disconnected at end of recording)
- */
+
 function trimSeriesZeros(pts, validMin = 0) {
   const lo = validMin > 0 ? validMin : 0;
   const first = pts.findIndex(p => p.value > 0 && p.value >= lo);
@@ -240,10 +219,7 @@ function trimSeriesZeros(pts, validMin = 0) {
   return pts.slice(first, last + 1);
 }
 
-/**
- * Downsample to one point per intervalSecs window.
- * Always keeps the first and last point.
- */
+
 function resampleTimeline(points, intervalSecs) {
   if (!points.length || intervalSecs <= 0) return points;
   const out  = [];
@@ -258,13 +234,7 @@ function resampleTimeline(points, intervalSecs) {
 
 // ─── Single-series SVG chart (one measurement per chart panel) ───────────────
 
-/**
- * Builds a compact SVG chart for exactly ONE measurement series.
- * pts = [{second, value}, ...]  — already trimmed of leading/trailing zeros.
- * opts.markers   = [{second, label}]
- * opts.sharedScale = {min, max} | null
- * opts.refBands  = [{min, max, color}] | undefined
- */
+
 function buildSingleSeriesChart(s, pts, opts = {}) {
   const { markers = [], sharedScale = null, refBands = [] } = opts;
 
@@ -373,7 +343,7 @@ function buildSingleSeriesChart(s, pts, opts = {}) {
     </div>`; // no trailing newline to avoid extra whitespace
 }
 
-// ─── Assemble charts — one panel per measurement ─────────────────────────────
+
 
 function buildMonitoringStyleCharts(reportData) {
   const timelinePoints = getTimelinePoints(reportData);
@@ -434,7 +404,7 @@ function buildMonitoringStyleCharts(reportData) {
     }
   }
 
-  // ── Extra signals from structured .vital file (devices/signals tree) ─────────
+  
   if (isStructuredReport(reportData)) {
     const extraSignals = flattenSignals(reportData).filter(sig => {
       const key = sig.key || (sig.label || '').toLowerCase().replace(/\s+/g, '_');
@@ -465,18 +435,14 @@ function buildMonitoringStyleCharts(reportData) {
           <div class="mc-chart-stack">${extraHtml}</div>
         </div>`;
     }
-  }
 
-  // ── Extra keys found in a flat timeline (any .vital format) ──────────────────
-  // Catches custom drugs, device-specific signals, etc. not in CHART_CONFIGS.
-  {
     const skipKeys = new Set([
       ...CHART_CONFIG_KEYS,
       'tbp',        // already split into _sbp/_dbp above
       'time', 'second', 'timestamp', 'label',
     ]);
 
-    // Collect every data key present in the timeline
+ 
     const allTimelineKeys = new Set();
     timelinePoints.forEach(tp => Object.keys(tp.data || {}).forEach(k => allTimelineKeys.add(k)));
 
@@ -524,7 +490,7 @@ function buildMonitoringStyleCharts(reportData) {
     </section>`;
 }
 
-// ─── Numbers / table view ─────────────────────────────────────────────────────
+
 
 function buildNumbersReport(reportData) {
   const cols = getMinutePoints(reportData);
@@ -557,11 +523,10 @@ function buildNumbersReport(reportData) {
     return `<tr><th style="white-space:nowrap;padding:8px 10px;text-align:left">${escapeHtml(p.label)}</th>${cells}</tr>`;
   }).join('');
 
-  // Summary statistics — use the FULL high-resolution timeline so every
-  // recorded sample contributes (not just the downsampled minute columns).
+
   const allPts = getTimelinePoints(reportData);
 
-  // Helper: extract numeric values for a key from the full timeline
+ 
   const timelineVals = (key, pMin) => allPts
     .map(pt => {
       if (key === '_sbp') return parseFloat(String(pt.data?.tbp ?? '').split('/')[0]);
@@ -570,7 +535,7 @@ function buildNumbersReport(reportData) {
     })
     .filter(v => !isNaN(v) && v > 0 && (pMin <= 0 || v >= pMin));
 
-  // Extend stats to also show SBP and DBP separately
+ 
   const statsParams = [
     ...NUMBER_TABLE_PARAMS.filter(p => p.key !== 'tbp'),
     { key: '_sbp', label: 'SBP (mmHg)' },
@@ -614,7 +579,7 @@ function buildNumbersReport(reportData) {
     </section>`;
 }
 
-// ─── Patient & events sections ────────────────────────────────────────────────
+
 
 function renderPatientSection(p) {
   return `
@@ -655,7 +620,6 @@ function renderEvents(reportData) {
     </section>`;
 }
 
-// ─── Structured .vital file sections (devices/signals view) ──────────────────
 
 function renderStructuredDeviceSections(reportData) {
   return (reportData.devices || []).map(dev => {
@@ -680,7 +644,7 @@ function renderStructuredDeviceSections(reportData) {
   }).join('');
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+
 
 export function printReport() { window.print(); }
 
