@@ -1,74 +1,20 @@
-/**
- * simulator.js
- * ------------
- * Simulation engine that generates realistic synthetic vital signs.
- *
- * Used in "simulation mode" when no VitalRecorder device is connected.
- * All vital signs are modelled as a combination of slow, medium, and
- * fast sine waves plus small random noise, keeping values within
- * physiologically plausible ranges for an anaesthetised pig.
- *
- * Public API (exported functions):
- *   createSimulator()           — factory that returns a simulator instance
- *   renderSnapshotToUI()        — write the latest snapshot values to DOM elements
- *   renderReportPreview()       — build a text-based report HTML preview
- *   updateSimulationIndicators()— update status labels and button states
- */
 
-
-// ── Private helpers ────────────────────────────────────────────────────────────
-
-/**
- * Clamp a number between a minimum and maximum value.
- *
- * @param {number} value
- * @param {number} min
- * @param {number} max
- * @returns {number}
- */
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
 
-/**
- * Return a uniformly distributed random number in [min, max).
- *
- * @param {number} min
- * @param {number} max
- * @returns {number}
- */
 function randomBetween(min, max) {
   return min + Math.random() * (max - min);
 }
 
 
-/**
- * Format a number with a fixed number of decimal places.
- *
- * @param {number} value
- * @param {number} [decimals=0]
- * @returns {string}
- */
 function formatNumber(value, decimals = 0) {
   return Number(value).toFixed(decimals);
 }
 
 
-/**
- * Determine the clinical status category based on key vital signs.
- *
- * Thresholds are chosen for an anaesthetised pig and indicate whether
- * the anaesthetist should intervene immediately (Attention), monitor
- * more closely (Observe), or no action is needed (Stable).
- *
- * @param {number} pulse     - Heart rate in bpm.
- * @param {number} systolic  - Systolic blood pressure in mmHg.
- * @param {number} temp      - Body temperature in °C.
- * @param {number} spo2      - Peripheral oxygen saturation in %.
- * @param {number} etco2     - End-tidal CO₂ in mmHg.
- * @returns {'Attention'|'Observe'|'Stable'}
- */
+
 function getClinicalCheck(pulse, systolic, temp, spo2, etco2) {
   if (pulse < 50 || systolic < 80 || spo2 < 92) {
     return 'Attention';
@@ -82,18 +28,7 @@ function getClinicalCheck(pulse, systolic, temp, spo2, etco2) {
 }
 
 
-/**
- * Generate one simulated vital-sign snapshot at time ``t``.
- *
- * Each signal is modelled using overlapping sine waves at different
- * frequencies plus a small random noise term, then clamped to a
- * physiological range. The slow-phase sine (~3 min cycle) models
- * gradual anaesthetic drift; the fast-phase (~8 s) models breath-to-
- * breath variation.
- *
- * @param {number} t - Elapsed time in seconds since the simulation started.
- * @returns {Object} A snapshot object with all vital-sign fields.
- */
+
 function generateSimulatedSnapshot(t) {
   const slowPhase   = t / 180;
   const mediumPhase = t / 32;
@@ -207,12 +142,7 @@ function generateSimulatedSnapshot(t) {
 }
 
 
-/**
- * Convert a raw snapshot into the string-formatted summary the report uses.
- *
- * @param {Object} data - Raw snapshot from generateSimulatedSnapshot().
- * @returns {Object} Summary with all values formatted as strings.
- */
+
 function measurementSummary(data) {
   return {
     ki:           data.ki,
@@ -236,12 +166,7 @@ function measurementSummary(data) {
 }
 
 
-/**
- * Format elapsed seconds as a "MM:SS" clock string.
- *
- * @param {number} totalSeconds - Elapsed time in whole seconds.
- * @returns {string} E.g. "05:42"
- */
+
 function formatClockFromSeconds(totalSeconds) {
   const mm = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
   const ss = String(totalSeconds % 60).padStart(2, '0');
@@ -249,15 +174,7 @@ function formatClockFromSeconds(totalSeconds) {
 }
 
 
-// ── Exported functions ─────────────────────────────────────────────────────────
 
-/**
- * Write the latest vital-sign snapshot values into the live display DOM elements.
- *
- * @param {Object} metricElements - Map of field name → DOM element
- *                                  (e.g. ``{ pulse: HTMLElement, … }``).
- * @param {Object} data           - Raw snapshot from generateSimulatedSnapshot().
- */
 export function renderSnapshotToUI(metricElements, data) {
   metricElements.ki.textContent           = data.ki;
   metricElements.pulse.textContent        = `${formatNumber(data.pulse, 0)} bpm`;
@@ -279,14 +196,6 @@ export function renderSnapshotToUI(metricElements, data) {
 }
 
 
-/**
- * Render a text-based report preview into an HTML container element.
- *
- * @param {HTMLElement} reportPreviewElement - Container element to populate.
- * @param {Object}      reportData           - Object with patient, firstMeasurement,
- *                                             minuteMeasurements, lastMeasurement,
- *                                             and eventLog.
- */
 export function renderReportPreview(reportPreviewElement, reportData) {
   const { patient, firstMeasurement, minuteMeasurements, lastMeasurement, eventLog } = reportData;
 
@@ -347,13 +256,7 @@ export function renderReportPreview(reportPreviewElement, reportData) {
 }
 
 
-/**
- * Update status labels and the start-button state to reflect simulation progress.
- *
- * @param {Object} elements - DOM element references:
- *   ``liveDataStatus``, ``simulationStatusPill``, ``startSimulationButton``.
- * @param {Object} state    - Current simulator state from ``getState()``.
- */
+
 export function updateSimulationIndicators(elements, state) {
   const remaining         = Math.max(state.durationSeconds - state.elapsedSeconds, 0);
   const elapsedMinutes    = Math.floor(state.elapsedSeconds / 60);
@@ -383,23 +286,7 @@ export function updateSimulationIndicators(elements, state) {
 }
 
 
-/**
- * Create a new simulator instance.
- *
- * The simulator advances time by one second on every tick, records a
- * measurement at the start of each minute, and stops automatically when
- * ``durationSeconds`` is reached.
- *
- * @param {Object}   options
- * @param {number}   options.durationSeconds - Total simulation length in seconds.
- * @param {number}   options.stepMs          - Interval between ticks in milliseconds
- *                                             (use 1000 for real-time).
- * @param {Function} options.onUpdate        - Called each tick with
- *                                             (snapshot, state).
- * @param {Function} options.onComplete      - Called once when the simulation ends,
- *                                             with the final state.
- * @returns {{ start: Function, stop: Function, addEvent: Function, getState: Function }}
- */
+
 export function createSimulator({ durationSeconds, stepMs, onUpdate, onComplete }) {
   let intervalId       = null;
   let running          = false;
@@ -424,11 +311,6 @@ export function createSimulator({ durationSeconds, stepMs, onUpdate, onComplete 
     };
   }
 
-  /**
-   * Add a timestamped clinical event to the event log.
-   *
-   * @param {string} text - Free-text description of the event.
-   */
   function addEvent(text) {
     if (!text || !text.trim()) return;
 
@@ -450,7 +332,6 @@ export function createSimulator({ durationSeconds, stepMs, onUpdate, onComplete 
     }
   }
 
-  /** Advance the simulation by one second and fire onUpdate. */
   function tick() {
     latestSnapshot     = generateSimulatedSnapshot(elapsedSeconds);
     const summary      = measurementSummary(latestSnapshot);
@@ -477,7 +358,7 @@ export function createSimulator({ durationSeconds, stepMs, onUpdate, onComplete 
     }
   }
 
-  /** Reset state and start the simulation from the beginning. */
+
   function start() {
     if (running) return;
 
