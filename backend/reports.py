@@ -1,6 +1,6 @@
 """
 backend_reports.py
-------------------
+
 Utility for generating placeholder HTML reports on the backend.
 
 The full, chart-rich report is assembled by the JavaScript frontend.
@@ -15,16 +15,7 @@ from backend_config import REPORTS_DIR
 
 
 def generate_placeholder_report(session_id: str) -> Path:
-    """
-    Write a minimal HTML report file for the given session.
-
-    Args:
-        session_id: The unique session identifier (timestamp string
-                    in the format ``YYYYMMDD_HHMMSS``).
-
-    Returns:
-        The Path of the written HTML file inside ``REPORTS_DIR``.
-    """
+    
     report_path = REPORTS_DIR / f"{session_id}.html"
 
     html = f"""<!DOCTYPE html>
