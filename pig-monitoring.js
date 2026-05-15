@@ -1,3 +1,7 @@
+// Pig-monitoring.js: The first part processes vital data, determines whether it is normal or abnormal, 
+//and plots all charts and graphs (pulse, blood pressure, respiration, ECG), 
+//and the second part controls the system, such as turning the panel on and off, adding or clearing data, and updating the display.
+
 const pigMonitoringState = {
   visible: false,
   history: [],
