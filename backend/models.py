@@ -1,5 +1,6 @@
 """
-FastAPI utilizes these models to automatically validate incoming JSON request bodies and generate API documentation. Each field has a default value, allowing partial payloads to be accepted without issue.
+FastAPI uses these models to automatically validate incoming JSON request data and generate API documentation. 
+Each field has a default value, allowing partial data to be accepted without issues.
 """
 
 from __future__ import annotations
