@@ -1,8 +1,4 @@
-"""
-backend_vitalrecorder.py
-Bridge between the Python backend and the VitalRecorder™ application.
-"""
-
+# Bridge between backend and VitalRecorder application
 from __future__ import annotations
 
 import re
@@ -17,9 +13,9 @@ def _safe_stem(text: str) -> str:
    
     return re.sub(r'[\\/:*?"<>|]+', "_", text).strip("_ ")
 
-
-class VitalRecorderBridge:
    
+class VitalRecorderBridge:
+
 
     def __init__(self) -> None:
         self.running                       = False
@@ -31,21 +27,7 @@ class VitalRecorderBridge:
         self._desired_stem: str | None     = None
 
     def start(self, desired_stem: str | None = None) -> dict:
-        """
-        Launch VitalRecorder and begin recording.
-
-        If the process is already running this is a no-op and the
-        method returns immediately with ``ok=True``.
-
-        Args:
-            desired_stem: Base name (without extension) to use when
-                          renaming the resulting `.vital` file. Unsafe
-                          characters are stripped automatically.
-
-        Returns:
-            A dict with at least ``ok`` (bool) and ``message`` (str).
-            On success it also contains ``pid`` (int).
-        """
+       
         if self.process and self.process.poll() is None:
             self.running = True
             return {"ok": True, "message": "Vital Recorder already running"}
@@ -124,7 +106,7 @@ class VitalRecorderBridge:
             return None
 
         if self.recording_started_at:
-            recent = [
+            recent = [     # Filters files created around recording start time
                 path
                 for path in vital_files
                 if path.stat().st_mtime >= self.recording_started_at - 10
