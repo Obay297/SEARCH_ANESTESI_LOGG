@@ -1,12 +1,7 @@
 """
-backend_reports.py
-
-Utility for generating placeholder HTML reports on the backend.
-
-The full, chart-rich report is assembled by the JavaScript frontend.
-This module produces a minimal HTML file that confirms a session
-exists — useful for debugging or as a fallback when the frontend is
-unavailable.
+A tool for creating temporary HTML reports in the backend.
+This module produces a simple HTML file confirming the existence of a session.
+This is useful for debugging or as a workaround if the frontend is unavailable.
 """
 
 from pathlib import Path
