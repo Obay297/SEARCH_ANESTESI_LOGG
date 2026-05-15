@@ -1,4 +1,7 @@
-
+ //The waves.js displays real-time biomedical waveforms on an HTML panel.
+//It draws a structured grid background to simulate medical monitoring screens.
+//The waveform dynamically adapts to incoming digital data using scaling and normalization.
+//The waves.js handles missing or invalid samples seamlessly, ensuring continuous signal display
 function drawGrid(ctx, width, height) {
   ctx.save();
   ctx.strokeStyle = 'rgba(120, 220, 255, 0.10)';
