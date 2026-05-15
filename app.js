@@ -26,7 +26,7 @@ const LATEST_REPORT_FIELDS = [
   { key: 'etco2',        label: 'ETCO₂' }
 ];
  
-// ─── Element refs ─────────────────────────────────────────────────────────────
+
  
 const elements = {
   simulationModeButton:     document.getElementById('btn-simulation-mode'),
@@ -123,7 +123,7 @@ const pigRefs = {
   }
 };
  
-// ─── State ────────────────────────────────────────────────────────────────────
+// State
 
 let liveSocket               = null;
 let currentSource            = 'simulation';
@@ -145,7 +145,7 @@ const recorderState = {
   latestSnapshot:     null
 };
  
-// ─── Utilities ────────────────────────────────────────────────────────────────
+// Utilities 
  
 function formatClockFromSeconds(totalSeconds) {
   const s   = Math.max(0, Math.floor(totalSeconds));
@@ -166,8 +166,7 @@ function getZeroSnapshot() {
   };
 }
  
-// ─── UI updates ───────────────────────────────────────────────────────────────
- 
+// UI updates
 function updateIndicators() {
   elements.currentSourceLabel.textContent = currentSource;
  
@@ -282,7 +281,7 @@ function renderReportPreview() {
   renderPrintableReport(elements.reportPreview, reportData);
 }
  
-// ─── Latest record panel ──────────────────────────────────────────────────────
+// Latest record panel
  
 function renderLatestRecordSummary(payload) {
   if (!elements.latestRecordSummary) return;
@@ -355,7 +354,7 @@ function renderMinuteReportTable(reportData) {
     <tbody>${rows}</tbody>`;
 }
  
-// ─── Backend calls ────────────────────────────────────────────────────────────
+// Backend calls 
  
 async function selectSource(source) {
   const response = await fetch(`${BRIDGE_HTTP}/source/select`, {
@@ -403,7 +402,7 @@ async function loadLatestRecord() {
       throw new Error(payload.error || 'Failed to load latest record');
     }
 
-    // Store for use in charts and print report
+  
     loadedVitalData = payload.reportData;
 
     // Prefer last real measurement from the timeline; fall back to snapshot field
@@ -444,13 +443,12 @@ function exportMonitoringExcel() {
     return;
   }
 
-  // ── Build a proper multi-sheet CSV workbook that Excel opens natively ──
-  // We use the UTF-8 BOM (\uFEFF) so Excel reads special characters correctly.
+  
 
   const patient  = getPatientFormData(elements.patientForm) || {};
   const sections = [];
 
-  // — Sheet 1: Patient / session info —
+
   sections.push('=== Session Info ===');
   sections.push('Field,Value');
   Object.entries(patient).forEach(([k, v]) =>
@@ -459,7 +457,7 @@ function exportMonitoringExcel() {
   sections.push(`Source,${csvEsc(currentSource || '')}`);
   sections.push('');
 
-  // — Sheet 2: Monitoring measurements —
+  
   sections.push('=== Monitoring Data ===');
   const dataHeaders = Object.keys(payload.rows[0]);
   sections.push(dataHeaders.map(csvEsc).join(','));
@@ -468,7 +466,7 @@ function exportMonitoringExcel() {
   );
   sections.push('');
 
-  // — Sheet 3: Procedure events —
+
   sections.push('=== Procedure Events ===');
   sections.push('Time,Event');
   payload.events.forEach(ev =>
@@ -493,7 +491,7 @@ function exportMonitoringExcel() {
     elements.liveDataStatus.textContent = '✅ Exported — open the .csv file in Excel';
 }
 
-/** Wrap value in quotes if it contains comma, quote, or newline */
+
 function csvEsc(v) {
   const s = String(v ?? '');
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
@@ -510,7 +508,6 @@ function exportVitalFileToCSV() {
   const timeline = data.timeline ?? [];
   const csvRows  = [];
 
-  // Friendly column name map (key → display label)
   const LABEL = {
     pulse: 'HR (bpm)', tbp: 'BP (mmHg)', temp: 'Temp (°C)',
     o2_primary: 'FiO₂ (%)', o2_secondary: 'FeO₂ (%)',
@@ -523,8 +520,6 @@ function exportVitalFileToCSV() {
   const colLabel = k => LABEL[k] || k;
 
   if (minutes.length) {
-    // ── Minute-level summary sheet ────────────────────────────────────
-    // Auto-detect every key present across all minutes (first + last)
     const keySet = new Set();
     minutes.forEach(m => {
       Object.keys(m.first || {}).forEach(k => keySet.add(k));
@@ -543,7 +538,6 @@ function exportVitalFileToCSV() {
       ]);
     }
 
-    // Append blank row then stats summary below the data
     csvRows.push([]);
     csvRows.push(['=== SUMMARY STATISTICS ===']);
     csvRows.push(['Parameter', 'Min', 'Max', 'Average', 'Samples']);
@@ -563,7 +557,6 @@ function exportVitalFileToCSV() {
     }
 
   } else if (timeline.length) {
-    // ── Full timeline sheet (per-second/per-point) ────────────────────
     const keySet = new Set();
     timeline.forEach(pt => Object.keys(pt.data || {}).forEach(k => keySet.add(k)));
     const keys = [...keySet];
@@ -597,7 +590,7 @@ function exportVitalFileToCSV() {
     return;
   }
 
-  // Serialise → CSV with UTF-8 BOM so Excel opens with correct encoding
+
   const escapeCell = cell => {
     const s = String(cell ?? '');
     return (s.includes(',') || s.includes('"') || s.includes('\n'))
@@ -617,7 +610,6 @@ function exportVitalFileToCSV() {
   URL.revokeObjectURL(url);
 }
 
-// ─── Recorder state ───────────────────────────────────────────────────────────
  
 function resetRecordingState() {
   recorderState.recording          = false;
@@ -631,7 +623,7 @@ function resetRecordingState() {
   recorderState.latestSnapshot     = null;
 }
  
-// ─── Experimental mode ────────────────────────────────────────────────────────
+
  
 function generateExperimentalSnapshot(tick) {
   const pulse     = 68 + Math.round(8 * Math.sin(tick / 3));
@@ -765,7 +757,7 @@ function stopExperimentalValues() {
   updateIndicators();
 }
  
-// ─── Button listeners ─────────────────────────────────────────────────────────
+
  
 elements.simulationModeButton.addEventListener('click', async () => {
   try {
@@ -804,11 +796,10 @@ elements.startRecordingButton.addEventListener('click', async () => {
 
     resetRecordingState();
 
-    // Read chosen duration from the selector next to the Start button
+
     const durSel = document.getElementById('select-duration');
     recorderState.durationSeconds = durSel ? (parseInt(durSel.value, 10) || 4 * 3600) : 4 * 3600;
 
-    // Build session name from patient ID + date (same stem used for .vital file)
     const patientData = getPatientFormData(elements.patientForm);
     const pid         = (patientData.id   || '').trim();
     const pdate       = (patientData.date || '').trim().slice(0, 10).replace(/-/g, '');
@@ -898,14 +889,14 @@ elements.addEventButton.addEventListener('click', () => {
   setPigMonitoringEvents(recorderState.eventLog, pigRefs);
 });
  
-// ─── Auto-capture for key clinical timepoints ─────────────────────────────────
+
 
 function captureTimepointSnapshot(label) {
   if (!recorderState.latestSnapshot) return;
   const time    = formatClockFromSeconds(recorderState.elapsedSeconds);
   const summary = measurementSummary(recorderState.latestSnapshot);
 
-  // Avoid duplicate timepoints with same label
+
   if (recorderState.minuteMeasurements.some(m => m.label === label)) return;
 
   recorderState.minuteMeasurements.push({ time, label, data: summary, isTimepoint: true });
@@ -922,7 +913,7 @@ function captureTimepointSnapshot(label) {
   setPigMonitoringEvents(recorderState.eventLog, pigRefs);
 }
 
-// ─── Modal helpers ────────────────────────────────────────────────────────────
+
 
 function showPrintFormatModal() {
   return new Promise(resolve => {
@@ -933,7 +924,6 @@ function showPrintFormatModal() {
     let selFormat   = 'charts';
     let selInterval = 60;
 
-    // Reflect defaults visually
     const setActive = (group, activeId) => {
       modal.querySelectorAll(`[data-group="${group}"]`).forEach(b => {
         b.classList.toggle('modal-toggle-active', b.id === activeId);
@@ -954,22 +944,21 @@ function showPrintFormatModal() {
   });
 }
 
-// Anesthesia (sedation) time → auto-capture snapshot
+
 document.getElementById('input-sedation-time')?.addEventListener('change', () => {
   captureTimepointSnapshot('Sedation');
 });
 
-// Intubation time → auto-capture snapshot
 document.getElementById('input-intubation-time')?.addEventListener('change', () => {
   captureTimepointSnapshot('Intubation');
 });
 
-// Incision start time → auto-capture snapshot
+
 document.getElementById('input-incision-time')?.addEventListener('change', () => {
   captureTimepointSnapshot('Incision start');
 });
 
-// Report preview toggle: Charts / Numbers (in-app preview only)
+
 document.getElementById('btn-view-charts')?.addEventListener('click', () => {
   setReportViewMode('charts');
   document.getElementById('btn-view-charts')?.classList.add('active');
@@ -984,8 +973,6 @@ document.getElementById('btn-view-numbers')?.addEventListener('click', () => {
   renderReportPreview();
 });
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
- 
 setAutomaticDate(elements.patientForm);
 renderEventLog([]);
 renderReportPreview();
@@ -994,7 +981,7 @@ initPigMonitoring(pigRefs);
 updateIndicators();
 selectSource('simulation').catch(console.error);
  
-// Live clock — ticks every second on the Kl. card
+
 setInterval(() => {
   if (elements.metrics.ki) {
     elements.metrics.ki.textContent = new Date().toLocaleTimeString([], {
