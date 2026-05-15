@@ -1,8 +1,6 @@
 """
 backend_sessions.py
--------------------
 Session lifecycle management for recording sessions.
-
 A "session" groups one pig procedure: it stores the patient metadata
 and the list of clinical events that occurred during the recording.
 Session data is persisted to disk as JSON so it survives a server
