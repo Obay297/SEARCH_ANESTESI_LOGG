@@ -1,19 +1,7 @@
 """
 backend_vital_parser.py
------------------------
+
 Parses `.vital` files produced by VitalRecorder™ into structured data.
-
-This is the core data-processing module. It reads the proprietary binary
-format via the ``vitaldb`` library and extracts two kinds of output:
-
-1. **Structured signal report** — per-signal statistics and down-sampled
-   trend points, used to draw the SVG charts in the frontend.
-2. **Legacy timeline report** — per-minute first/last measurements in the
-   flat format the frontend's report table expects.
-
-Device-to-field mapping is centralised in ``SIGNAL_SPECS`` and
-``LEGACY_TRACK_CANDIDATES`` so that the parser works with multiple monitor
-brands (Solar8000, IntelliVue, Primus, BIS, etc.) without code duplication.
 """
 
 from __future__ import annotations
@@ -363,24 +351,7 @@ def find_first_stable_valid_value(
     signal_key: str,
     stable_samples: int = 5,
 ) -> dict[str, Any] | None:
-    """
-    Find the first run of consecutive valid samples in a signal series.
-
-    Sensor warm-up often produces invalid readings at the start of a
-    recording. This function skips those by requiring ``stable_samples``
-    consecutive valid values before accepting a reading as reliable.
-
-    Args:
-        series:         Array-like of numeric samples (may contain NaN).
-        signal_key:     Key into ``SIGNAL_SPECS`` used to look up the
-                        physiological validity range (e.g. ``"hr"``).
-        stable_samples: Minimum number of consecutive valid samples
-                        required before the first value is accepted.
-
-    Returns:
-        A dict with ``index`` (int), ``value`` (float), and
-        ``stableSamples`` (int), or None if no stable run is found.
-    """
+   
     arr = _to_float_array(series)
     if arr.size == 0:
         return None
@@ -572,32 +543,7 @@ def extract_structured_report(
     interval_seconds: float = 1.0,
     stable_samples: int = 5,
 ) -> dict[str, Any]:
-    """
-    Parse a `.vital` file and return a structured signal report.
 
-    Reads all signals defined in ``SIGNAL_SPECS``, computes per-signal
-    statistics (min, max, average), down-samples trend points to at most
-    240 data points for chart rendering, and finds the first stable valid
-    value for each signal (skipping sensor warm-up noise).
-
-    Args:
-        vital_path:       Path to the `.vital` recording file.
-        interval_seconds: Resampling interval passed to ``vitaldb``.
-                          Use 1.0 for per-second resolution.
-        stable_samples:   Consecutive valid samples required before the
-                          first measurement is accepted.
-
-    Returns:
-        A nested dict with keys ``fileName``, ``filePath``,
-        ``generatedAt``, ``durationSeconds``, ``durationLabel``,
-        ``signalsFound``, ``devices`` (list of device dicts, each
-        containing ``signals``), and ``snapshot`` (flat measurement dict
-        for the live display panel).
-
-    Raises:
-        FileNotFoundError: If ``vital_path`` does not exist.
-        RuntimeError:      If the ``vitaldb`` library is not installed.
-    """
     _ensure_vitaldb_available()
 
     vital_path = Path(vital_path)
@@ -662,7 +608,7 @@ def extract_first_valid_measurements(
     )
 
 
-# ─── Legacy timeline report (used by /record/latest and stop-recording) ───────
+# Legacy timeline report (used by /record/latest and stop-recording) 
 
 # Multi-candidate track lookup — covers Solar8000, Demo, B1x5M, Bx50, Primus devices.
 # _find_track_name() also does suffix fallback so e.g. "Solar8000/HR" matches "Demo/HR".
@@ -889,28 +835,7 @@ def _legacy_build_statistics(timeline: list[dict[str, Any]]) -> list[dict[str, A
 
 
 def extract_report_timeseries(vital_path: str | Path) -> dict[str, Any]:
-    """
-    Parse a `.vital` file and return a per-minute timeline report.
 
-    Divides the recording into 60-second windows and extracts the first
-    and last valid measurement in each window for every tracked signal.
-    This format matches what the frontend report table and SVG chart
-    renderer expect.
-
-    Args:
-        vital_path: Path to the `.vital` recording file.
-
-    Returns:
-        A dict with keys ``firstMeasurement``, ``lastMeasurement``,
-        ``minutes`` (list of per-minute dicts with ``first`` and
-        ``last`` measurement snapshots), ``timeline`` (flat list of
-        last-per-minute snapshots), ``statistics``, ``parameters``,
-        and ``reportKind`` set to ``"timeline"``.
-
-    Raises:
-        FileNotFoundError: If ``vital_path`` does not exist.
-        RuntimeError:      If the ``vitaldb`` library is not installed.
-    """
     _ensure_vitaldb_available()
     vital_path = Path(vital_path)
     if not vital_path.exists():
@@ -973,7 +898,6 @@ def extract_report_timeseries(vital_path: str | Path) -> dict[str, Any]:
     }
 
 
-# ─── Raw waveform extraction ──────────────────────────────────────────────────
 
 def _coerce_raw_wave_values(values: Any) -> list[float | None]:
     arr = _to_float_array(values)
@@ -1038,27 +962,7 @@ def _extract_raw_wave_track(vf: Any, track_name: str) -> tuple[list[float | None
 
 
 def extract_raw_waveforms(vital_path: str | Path) -> dict[str, dict[str, Any]]:
-    """
-    Extract high-frequency waveform data (ECG, arterial, pleth, CO₂).
-
-    Unlike the numeric trend signals, waveforms are sampled at hundreds
-    of Hz. Gaps between records are filled with ``None`` so the frontend
-    renderer can draw breaks in the line rather than connecting across
-    missing data.
-
-    Args:
-        vital_path: Path to the `.vital` recording file.
-
-    Returns:
-        A dict keyed by wave name (``"ecg"``, ``"art"``, ``"pleth"``,
-        ``"co2"``). Each value is a dict with ``track`` (str or None),
-        ``srate`` (float, samples per second), and ``samples``
-        (list of float or None).
-
-    Raises:
-        FileNotFoundError: If ``vital_path`` does not exist.
-        RuntimeError:      If the ``vitaldb`` library is not installed.
-    """
+   
     _ensure_vitaldb_available()
 
     vital_path = Path(vital_path)
