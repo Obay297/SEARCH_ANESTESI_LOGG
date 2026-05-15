@@ -62,7 +62,7 @@ class VitalRecorderBridge:
             except Exception:
                 pass
 
-        # Poll until the .vital file appears and stops growing (max 15 s).
+        # Poll until the .vital 
         newest    = None
         deadline  = time.time() + 15
         last_size: int | None = None
@@ -73,11 +73,11 @@ class VitalRecorderBridge:
             if candidate:
                 size = candidate.stat().st_size
                 if size > 0 and size == last_size:
-                    # File size unchanged for 1 s — safe to treat as complete.
+                  
                     newest = candidate
                     break
                 last_size = size
-                newest    = candidate  # keep track even if not stable yet
+                newest    = candidate  
 
         if newest and self._desired_stem:
             target = newest.with_name(_safe_stem(self._desired_stem) + ".vital")
