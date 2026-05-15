@@ -1,3 +1,6 @@
+//The data-analysis.js module is used to load CSV/JSON files, analyze and normalize data, 
+//calculate statistics, display an analytical user interface and printable reports, and integrate with the report printing system.
+
 import { printReport } from './report.js';
 
 function isNumeric(value) {
