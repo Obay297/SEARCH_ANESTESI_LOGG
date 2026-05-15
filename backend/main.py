@@ -200,7 +200,7 @@ def _fetch_from_growing_vital_file_sync() -> dict | None:
 async def _try_read_growing_vital_file() -> dict | None:
     return await asyncio.to_thread(_fetch_from_growing_vital_file_sync)
 
-
+# A method for all vital sign
 def _map_vr_tracks_to_measurements(raw: dict) -> dict:
     def _get(*keys):
         for key in keys:
@@ -252,27 +252,15 @@ async def health():
     return {"ok": True}
 
 
-@app.post("/source/select")
+@app.post("/source/select") # Switches active data source (simulation / live / file)
 async def select_source(payload: SourceSelectRequest):
-    """
-    Switch the active data source.
-
-    Accepted values for ``source``: ``"simulation"``, ``"vitalrecorder"``,
-    or ``"latest-file"``.
-    """
     current_source["name"] = payload.source
     return {"ok": True, "source": payload.source}
 
 
 @app.post("/recording/start")
 async def start_recording(payload: StartRecordingRequest):
-    """
-    Create a new session and launch VitalRecorder.
-
-    The resulting `.vital` file will be named after the patient ID and
-    date (e.g. ``42_20260101.vital``). If no patient ID is provided the
-    filename falls back to a timestamp (``recording_YYYYMMDD_HHMM.vital``).
-    """
+  
     patient_payload = payload.patient.model_dump() if payload.patient else {}
     session         = session_store.create_session(patient_payload)
 
@@ -365,7 +353,7 @@ async def get_report(filename: str):
      return FileResponse(REPORTS_DIR / filename, media_type="text/html")
 
 
-@app.get("/record/latest")
+@app.get("/record/latest") # Loads latest record + returns snapshot + timeline report for UI
 async def load_latest_record():
    
     vital_file = _resolve_latest_vital_file()
@@ -402,7 +390,7 @@ async def load_latest_record():
     }
 
 
-@app.get("/debug/vital-file")
+@app.get("/debug/vital-file")  #available tracks and mapping status per signal
 async def debug_vital_file():
   
     try:
@@ -436,7 +424,7 @@ async def debug_vital_file():
         return {"ok": False, "error": str(exc)}
 
 
-@app.get("/debug/vr-tracks")
+@app.get("/debug/vr-tracks") #compares HTTP API vs file-based data sources
 async def debug_vr_tracks():
    
     raw_http = await _try_read_vitalrecorder_http()
@@ -448,13 +436,13 @@ async def debug_vr_tracks():
     }
 
 
-@app.post("/export/monitoring-xlsx")
+@app.post("/export/monitoring-xlsx")  # patient info, monitoring rows, and events
 async def export_monitoring_xlsx(payload: MonitoringExportRequest):
    
     try:
-        import openpyxl  # noqa: PLC0415
+        import openpyxl 
     except ImportError:
-        from fastapi import HTTPException  # noqa: PLC0415
+        from fastapi import HTTPException  
         raise HTTPException(
             status_code=500,
             detail="openpyxl not installed. Run: pip install openpyxl",
@@ -498,7 +486,7 @@ async def export_monitoring_xlsx(payload: MonitoringExportRequest):
 
 
 
-@app.websocket("/live")
+@app.websocket("/live") # WebSocket endpoint for real-time streaming of vital measurements 
 async def live_socket(websocket: WebSocket):
   
     await websocket.accept()
@@ -522,9 +510,9 @@ async def live_socket(websocket: WebSocket):
     except (WebSocketDisconnect, Exception):
         pass
 
-app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
+app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")  # Serves frontend static files (HTML/CSS/JS)
 
 
 if __name__ == "__main__":
-    import uvicorn  # noqa: PLC0415
+    import uvicorn # runs uvicorn server
     uvicorn.run("backend_main:app", host="127.0.0.1", port=8001, reload=False)
