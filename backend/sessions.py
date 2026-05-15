@@ -1,10 +1,6 @@
 """
-backend_sessions.py
-Session lifecycle management for recording sessions.
-A "session" groups one pig procedure: it stores the patient metadata
-and the list of clinical events that occurred during the recording.
-Session data is persisted to disk as JSON so it survives a server
-restart or an unexpected shutdown.
+Managing the recording session lifecycle.
+It represents a set of PIG actions, storing the patient's descriptive data and a list of clinical events that occurred during the recording.
 """
 
 from __future__ import annotations
@@ -15,31 +11,13 @@ from pathlib import Path
 
 from backend_config import SESSIONS_DIR
 
-
-class SessionStore:
-    """
-    Creates and manages the on-disk session for the current recording.
-
-    Only one session is active at a time. Call create_session() when a
-    recording starts and save_events() when it stops.
-    """
-
+# Creates and manages the on-disk session for the current recording. 
+# Only one session is active at a time.
+class SessionStore:  
     def __init__(self) -> None:
         self.current_session: dict | None = None
 
-    def create_session(self, patient_data: dict | None) -> dict:
-        """
-        Create a new session directory and write the initial JSON file.
-
-        Args:
-            patient_data: Dictionary of patient fields from the frontend
-                          form. May be None or empty if the user skipped
-                          the form.
-
-        Returns:
-            A dict with keys ``session_id`` (str), ``session_dir``
-            (Path), and ``patient`` (dict).
-        """
+    def create_session(self, patient_data: dict | None) -> dict:   # Create a new session directory and write the initial JSON file.
         session_id  = datetime.now().strftime("%Y%m%d_%H%M%S")
         session_dir = SESSIONS_DIR / session_id
         session_dir.mkdir(parents=True, exist_ok=True)
@@ -61,14 +39,7 @@ class SessionStore:
         }
         return self.current_session
 
-    def save_events(self, events: list[dict]) -> None:
-        """
-        Append the final event list to the current session JSON file.
-
-        Args:
-            events: List of event dicts, each with keys
-                    ``timeInSeconds``, ``displayTime``, and ``text``.
-        """
+    def save_events(self, events: list[dict]) -> None:  #Append the final event list to the current session JSON file.
         if not self.current_session:
             return
 
@@ -91,5 +62,5 @@ class SessionStore:
             json.dump(payload, handle, ensure_ascii=False, indent=2)
 
     def get_current(self) -> dict | None:
-        """Return the current session dict, or None if no session is active."""
+        #Return the current session dict, or None if no session is active.
         return self.current_session
