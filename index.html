@@ -135,7 +135,7 @@
       opacity: 0.8;
     }
 
-    /* ── Modal overlay ────────────────────────────────────────── */
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -255,7 +255,7 @@
     }
     .modal-print-btn:hover { opacity: 0.88; }
 
-    /* ── Report view toggle ───────────────────────────────────── */
+    
     .report-view-toggle {
       display: flex;
       gap: 0.4rem;
@@ -281,7 +281,7 @@
       font-weight: 600;
     }
 
-    /* ── Vital sign chart cards ───────────────────────────────── */
+
     .vital-chart-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -343,7 +343,6 @@
       opacity: 0.8;
     }
 
-    /* ── Monitoring-style report charts ──────────────────────── */
     .mc-chart-stack {
       display: flex;
       flex-direction: column;
@@ -402,9 +401,8 @@
       padding: 1rem 0;
     }
 
-    /* ── Print styles ─────────────────────────────────────────── */
     @media print {
-      /* Preserve the dark monitor theme exactly as on screen */
+      
       .mc-chart-stack,
       .mc-group {
         break-inside: avoid;
@@ -421,7 +419,7 @@
       }
       .mc-block {
         break-inside: avoid;
-        /* Keep the dark background — DO NOT override to white */
+       
         background: #0d1b2a !important;
         border: 1px solid rgba(136,207,255,0.22) !important;
         color: #dceeff !important;
@@ -433,7 +431,7 @@
         color: rgba(180,210,255,0.75) !important;
         opacity: 1 !important;
       }
-      /* SVG colours are already correct for dark bg — no overrides needed */
+   
 
       .modal-overlay,
       .report-view-toggle,
@@ -988,7 +986,7 @@
 
   <div id="print-report-root"></div>
 
-  <!-- ── Combined print options modal ────────────────────────────────── -->
+
   <div id="modal-print-format" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-print-title">
     <div class="modal-card">
       <h2 id="modal-print-title">&#x1F5A8; Final Report Options</h2>
