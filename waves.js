@@ -3,7 +3,6 @@ function drawGrid(ctx, width, height) {
   ctx.save();
   ctx.strokeStyle = 'rgba(120, 220, 255, 0.10)';
   ctx.lineWidth   = 1;
-
   for (let x = 0; x <= width; x += 24) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
@@ -20,9 +19,6 @@ function drawGrid(ctx, width, height) {
 
   ctx.restore();
 }
-
-
-
 export function drawWave(canvas, data, color = '#00ff88') {
   if (!canvas) return;
 
@@ -80,8 +76,6 @@ export function drawWave(canvas, data, color = '#00ff88') {
 
   ctx.stroke();
 }
-
-
 
 export function prepareWaveView(container) {
   container?.scrollIntoView({ behavior: 'smooth', block: 'start' });
