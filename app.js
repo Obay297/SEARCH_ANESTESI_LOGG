@@ -1,5 +1,11 @@
+//The app.js controller handles live streaming, recording sessions, 
+//demo simulations, user interface updates, report generation, 
+//event logging, data export, and WebSocket connection to the backend server.
+
 import { setAutomaticDate, getPatientFormData } from './patient.js';
+
 import { printReport, buildReportData, renderPrintableReport, setReportViewMode, getReportViewMode, setDisplayInterval } from './report.js';
+// Import patient form helper functions from patient.js
 import {
   initPigMonitoring,
   ensurePigMonitoringVisible,
@@ -95,7 +101,7 @@ const pigRefs = {
     vt:   document.getElementById('range-vt'),
     mv:   document.getElementById('range-mv')
   },
- 
+ \\
   dashboard: {
     vtValue:         document.getElementById('monitor-vt-value'),
     respValue:       document.getElementById('monitor-resp-value'),
@@ -866,7 +872,7 @@ elements.printReportButton.addEventListener('click', async () => {
   setReportViewMode(choice.format);
   setDisplayInterval(choice.interval);
 
-  // Use loaded .vital file data if available, otherwise live session
+  // Use loaded .vital file data 
   const base       = loadedVitalData ?? recorderState;
   const reportData = buildReportData(base, elements.patientForm, recorderState.eventLog);
   renderPrintableReport(elements.printReportRoot, reportData);
