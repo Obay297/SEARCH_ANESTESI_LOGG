@@ -1,3 +1,10 @@
+// The simulator.js program continuously generates simulated vital signs, such as heart rate, blood pressure, temperature, oxygen saturation, 
+//and anesthetic drug levels.
+//The program uses mathematical and random oscillations to simulate realistic physiological behavior over time.
+//It also dynamically assesses the pig's status (stable/monitored/under observation) based on predefined thresholds.
+//The simulator.js also structures data snapshots for reporting, recording, and real-time monitoring updates.
+
+
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
